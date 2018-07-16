@@ -4,14 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.app.Fragment;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -20,7 +19,6 @@ import com.uday.mvp_recyclerview_demo.adapter.CountryFactsAdapter;
 import com.uday.mvp_recyclerview_demo.model.Country;
 import com.uday.mvp_recyclerview_demo.presenter.MainPresenter;
 import com.uday.mvp_recyclerview_demo.presenter.MainViewInterface;
-import com.uday.mvp_recyclerview_demo.ui.activity.MainActivity;
 import com.uday.mvp_recyclerview_demo.utils.MyDividerItemDecoration;
 
 import java.util.Arrays;
@@ -51,11 +49,9 @@ public class FactsFragment extends Fragment implements MainViewInterface, SwipeR
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_factlist, container, false);
+        unbinder = ButterKnife.bind(this, view);
         initView(view);
         setupMVP();
-        getFacts();
-        ButterKnife.bind(this, view);
-        unbinder = ButterKnife.bind(this, view);
         return view;
     }
     private void setupMVP() {
@@ -63,10 +59,8 @@ public class FactsFragment extends Fragment implements MainViewInterface, SwipeR
     }
 
     private void initView(View view){
-        rvFacts = view.findViewById(R.id.rvFacts);
         rvFacts.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvFacts.addItemDecoration(new MyDividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL, 16));
-        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         swipeContainer.setOnRefreshListener(this);
         swipeContainer.setColorSchemeResources(R.color.colorPrimary,
                 android.R.color.holo_green_dark,
