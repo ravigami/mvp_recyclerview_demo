@@ -1,0 +1,35 @@
+package com.uday.mvp_recyclerview_demo.app;
+
+import android.app.Application;
+
+import com.uday.mvp_recyclerview_demo.constant.Constant;
+import com.uday.mvp_recyclerview_demo.di.ApiModule;
+import com.uday.mvp_recyclerview_demo.di.AppModule;
+
+
+public class MyApplication extends Application {
+
+    private static ApiComponent mApiComponent;
+    private static MyApplication mInstance;
+
+
+    public static synchronized MyApplication getInstance() {
+        return mInstance;
+    }
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mInstance = this;
+        mApiComponent = DaggerApiComponent.builder()
+                .appModule(new AppModule(this))
+                .apiModule(new ApiModule(Constant.BASE_URL))
+                .build();
+
+    }
+
+    public static ApiComponent getNetComponent() {
+        return mApiComponent;
+    }
+}

@@ -1,4 +1,4 @@
-package com.uday.mvp_recyclerview_demo;
+package com.uday.mvp_recyclerview_demo.ui.activity;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.uday.mvp_recyclerview_demo.fragments.FactsFragment;
+
+import com.uday.mvp_recyclerview_demo.R;
+import com.uday.mvp_recyclerview_demo.ui.fragments.FactsFragment;
+
 
 public class MainActivity extends AppCompatActivity {
 
