@@ -1,5 +1,7 @@
 package com.uday.mvp_recyclerview_demo.ui.fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -24,10 +26,11 @@ import com.uday.mvp_recyclerview_demo.utils.MyDividerItemDecoration;
 import java.util.Arrays;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class FactsFragment extends Fragment implements MainViewInterface {
-
+public class FactsFragment extends Fragment implements MainViewInterface, SwipeRefreshLayout.OnRefreshListener {
+    private CountrySelectedListener mCallback;
     MainPresenter mainPresenter;
     private CountryFactsAdapter adapter;
     @BindView(R.id.rvFacts)
@@ -38,6 +41,11 @@ public class FactsFragment extends Fragment implements MainViewInterface {
     SwipeRefreshLayout swipeContainer;
     private Unbinder unbinder;
 
+    // Container Activity must implement this interface
+    public interface CountrySelectedListener {
+        public void onCountrySelected(String Country);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -46,6 +54,8 @@ public class FactsFragment extends Fragment implements MainViewInterface {
         initView(view);
         setupMVP();
         getFacts();
+        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
         return view;
     }
     private void setupMVP() {
@@ -56,15 +66,58 @@ public class FactsFragment extends Fragment implements MainViewInterface {
         rvFacts = view.findViewById(R.id.rvFacts);
         rvFacts.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvFacts.addItemDecoration(new MyDividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL, 16));
+        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        swipeContainer.setOnRefreshListener(this);
+        swipeContainer.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        swipeContainer.post(new Runnable() {
+
+            @Override
+            public void run() {
+                // Fetching data from server
+                mainPresenter.getFacts();
+            }
+        });
+
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Activity a = null;
 
+        if (context instanceof Activity) {
+            a = (Activity) context;
+        }
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mCallback = (CountrySelectedListener) a;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(a.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
     private void getFacts() {
 
         mainPresenter.getFacts();
 
     }
-
+    /**
+     * This method is called when swipe refresh is pulled down
+     */
+    @Override
+    public void onRefresh() {
+        // Fetching data from server
+        mainPresenter.getFacts();
+    }
     @Override
     public void showToast(String str) {
         Toast.makeText(getActivity(),str,Toast.LENGTH_LONG).show();
@@ -84,6 +137,7 @@ public class FactsFragment extends Fragment implements MainViewInterface {
     public void displayFacts(Country country) {
         adapter = new CountryFactsAdapter(Arrays.asList(country.getRows()), getActivity().getApplicationContext());
         rvFacts.setAdapter(adapter);
+        mCallback.onCountrySelected(country.getTitle());
     }
 
     @Override
@@ -96,5 +150,11 @@ public class FactsFragment extends Fragment implements MainViewInterface {
     private void updateAdapter(@Nullable Country country) {
         adapter = new CountryFactsAdapter(Arrays.asList(country.getRows()), getActivity().getApplicationContext());
         rvFacts.setAdapter(adapter);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

@@ -13,7 +13,7 @@ import com.uday.mvp_recyclerview_demo.R;
 import com.uday.mvp_recyclerview_demo.ui.fragments.FactsFragment;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FactsFragment.CountrySelectedListener {
 
     private ActionBar actionBar;
     @BindView(R.id.fragmentContainer)
@@ -34,5 +34,9 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
 
+    }
+
+    public void onCountrySelected(String title) {
+        actionBar.setTitle(title);
     }
 }
