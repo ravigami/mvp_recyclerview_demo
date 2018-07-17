@@ -25,7 +25,7 @@ import com.uday.mvp_recyclerview_demo.model.Country;
 import com.uday.mvp_recyclerview_demo.network.ConnectivityReceiver;
 import com.uday.mvp_recyclerview_demo.presenter.MainPresenter;
 import com.uday.mvp_recyclerview_demo.presenter.MainViewInterface;
-import com.uday.mvp_recyclerview_demo.utils.MyDividerItemDecoration;
+
 
 import java.util.Arrays;
 
@@ -66,7 +66,6 @@ public class FactsFragment extends Fragment implements MainViewInterface, SwipeR
 
     private void initView(View view){
         rvFacts.setLayoutManager(new LinearLayoutManager(getActivity()));
-        rvFacts.addItemDecoration(new MyDividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL, 16));
         swipeContainer.setOnRefreshListener(this);
         swipeContainer.setColorSchemeResources(R.color.colorPrimary,
                 android.R.color.holo_green_dark,
