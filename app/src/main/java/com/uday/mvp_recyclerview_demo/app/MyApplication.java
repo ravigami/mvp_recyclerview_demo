@@ -5,6 +5,7 @@ import android.app.Application;
 import com.uday.mvp_recyclerview_demo.constant.Constant;
 import com.uday.mvp_recyclerview_demo.di.ApiModule;
 import com.uday.mvp_recyclerview_demo.di.AppModule;
+import com.uday.mvp_recyclerview_demo.network.ConnectivityReceiver;
 
 
 public class MyApplication extends Application {
@@ -28,7 +29,9 @@ public class MyApplication extends Application {
                 .build();
 
     }
-
+    public void setConnectivityListener(ConnectivityReceiver.ConnectivityReceiverListener listener) {
+        ConnectivityReceiver.connectivityReceiverListener = listener;
+    }
     public static ApiComponent getNetComponent() {
         return mApiComponent;
     }

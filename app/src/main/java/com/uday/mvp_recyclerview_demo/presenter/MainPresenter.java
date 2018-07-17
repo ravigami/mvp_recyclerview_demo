@@ -33,6 +33,7 @@ public class MainPresenter implements MainPresenterInterface {
 
     @Override
     public void getFacts() {
+        mvi.showProgressBar();
         getObservable().subscribeWith(getObserver());
     }
 

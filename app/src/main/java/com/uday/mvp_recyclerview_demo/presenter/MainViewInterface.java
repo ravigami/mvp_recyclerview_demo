@@ -5,7 +5,7 @@ import com.uday.mvp_recyclerview_demo.model.Country;
 
 public interface MainViewInterface {
 
-    void showToast(String s);
+    void showMsg(String s);
     void showProgressBar();
     void hideProgressBar();
     void displayFacts(Country country);
