@@ -8,14 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.uday.mvp_recyclerview_demo.R;
 import com.uday.mvp_recyclerview_demo.constant.Constant;
 import com.uday.mvp_recyclerview_demo.model.Facts;
-
-
 import java.util.List;
 
 import butterknife.BindView;

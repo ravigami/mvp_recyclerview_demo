@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.uday.mvp_recyclerview_demo.R;
 import com.uday.mvp_recyclerview_demo.adapter.CountryFactsAdapter;
@@ -23,9 +22,9 @@ import com.uday.mvp_recyclerview_demo.app.MyApplication;
 import com.uday.mvp_recyclerview_demo.constant.Constant;
 import com.uday.mvp_recyclerview_demo.model.Country;
 import com.uday.mvp_recyclerview_demo.network.ConnectivityReceiver;
+import com.uday.mvp_recyclerview_demo.network.NetworkService;
 import com.uday.mvp_recyclerview_demo.presenter.MainPresenter;
 import com.uday.mvp_recyclerview_demo.presenter.MainViewInterface;
-
 
 import java.util.Arrays;
 
@@ -44,7 +43,7 @@ public class FactsFragment extends Fragment implements MainViewInterface, SwipeR
     @BindView(R.id.swipe_container)
     SwipeRefreshLayout swipeContainer;
     private Unbinder unbinder;
-
+    private NetworkService service;
     // Container Activity must implement this interface
     public interface CountrySelectedListener {
         public void onCountrySelected(String Country);
@@ -61,7 +60,8 @@ public class FactsFragment extends Fragment implements MainViewInterface, SwipeR
         return view;
     }
     private void setupMVP() {
-        mainPresenter = new MainPresenter(this);
+        service = NetworkService.getInstance();
+        mainPresenter = new MainPresenter(this, service);
     }
 
     private void initView(View view){
@@ -105,14 +105,19 @@ public class FactsFragment extends Fragment implements MainViewInterface, SwipeR
         }
     }
     private void getFacts() {
-       if(isNetworkAvailable()) {
+
+      /* if(isNetworkAvailable()) {
            showRecyclerView();
            mainPresenter.getFacts();
        } else {
            showSnack(Constant.INTERNET_NOT_CONNECTED);
            showNoConnection();
-       }
-
+       }*/
+        showRecyclerView();
+        if(!isNetworkAvailable()) {
+            showSnack(Constant.INTERNET_NOT_CONNECTED);
+        }
+         mainPresenter.getFacts();
     }
     /**
      * This method is called when swipe refresh is pulled down
@@ -163,6 +168,7 @@ public class FactsFragment extends Fragment implements MainViewInterface, SwipeR
     @Override
     public void displayError(String e) {
         swipeContainer.setRefreshing(false);
+        showNoConnection();
         showMsg(e);
 
     }
@@ -189,12 +195,13 @@ public class FactsFragment extends Fragment implements MainViewInterface, SwipeR
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
-        //showSnack();
+        showMsg(Constant.INTERNET_CONNECTED);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        mainPresenter.decomposeObservable();
     }
 }

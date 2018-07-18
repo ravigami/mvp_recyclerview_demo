@@ -1,61 +1,48 @@
 package com.uday.mvp_recyclerview_demo.presenter;
 
 
-import android.util.Log;
-
-import com.uday.mvp_recyclerview_demo.app.MyApplication;
+import com.uday.mvp_recyclerview_demo.constant.Constant;
 import com.uday.mvp_recyclerview_demo.model.Country;
-import com.uday.mvp_recyclerview_demo.network.Api;
-
-import java.net.NetworkInterface;
-
-import javax.inject.Inject;
+import com.uday.mvp_recyclerview_demo.network.NetworkService;
 
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Retrofit;
 
 
 public class MainPresenter implements MainPresenterInterface {
-    @Inject
-    Retrofit retrofit;
+
     MainViewInterface mvi;
-    private String TAG = "MainPresenter";
-
-    public MainPresenter(MainViewInterface mvi) {
-        MyApplication.getNetComponent().inject(this);
+    private NetworkService service;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    public MainPresenter(MainViewInterface mvi,  NetworkService service) {
         this.mvi = mvi;
+        this.service = service;
     }
-
     @Override
     public void getFacts() {
         mvi.showProgressBar();
-        getObservable().subscribeWith(getObserver());
+        compositeDisposable.add(getObservable().subscribeWith(getObserver()));
     }
 
     public Observable<Country> getObservable(){
 
-        return retrofit.create(Api.class)
-                            .getCountryFacts()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread());
+        Observable<Country> factResponseObservable = (Observable<Country>)
+                service.getPreparedObservable(service.getAPI().getCountryFacts(), Country.class, true, false);
+        return factResponseObservable;
     }
-
     public DisposableObserver<Country> getObserver(){
         return new DisposableObserver<Country>() {
 
             @Override
-            public void onNext(@NonNull Country country) {
+            public void onNext(@io.reactivex.annotations.NonNull Country country) {
                 mvi.displayFacts(country);
+
             }
 
             @Override
-            public void onError(@NonNull Throwable e) {
-                mvi.displayError("Error fetching Facts Data");
+            public void onError(@io.reactivex.annotations.NonNull Throwable e) {
+                mvi.displayError(Constant.ERROR_MSG);
             }
 
             @Override
@@ -63,5 +50,10 @@ public class MainPresenter implements MainPresenterInterface {
                 mvi.hideProgressBar();
             }
         };
+    }
+
+    @Override
+    public void  decomposeObservable(){
+        compositeDisposable.clear();
     }
 }
