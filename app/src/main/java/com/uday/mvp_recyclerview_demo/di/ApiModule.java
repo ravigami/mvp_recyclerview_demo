@@ -22,6 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
     String mBaseUrl;
 
+    public ApiModule(){};
     public ApiModule(String mBaseUrl) {
         this.mBaseUrl = mBaseUrl;
     }
